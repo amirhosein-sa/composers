@@ -60,6 +60,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.amir.base_android.DefaultNavOptions
 import com.amir.base_android.Songs
+import com.amir.composeplayground.ui.ComposePlaygroundTheme
 import com.amir.composeplayground.ui.purple700
 import com.amir.composeplayground.ui.white100
 import com.amir.ui_all_songs.BottomBarTabs.AllSongs
@@ -85,7 +86,7 @@ class AllSongsFragment : Fragment() {
         val mockData = mockGenerator()
         return ComposeView(requireContext()).apply {
             setContent {
-                MaterialTheme {
+                ComposePlaygroundTheme {
                     ProvideWindowInsets {
                         Scaffold(modifier = Modifier
                             .fillMaxSize()
@@ -371,7 +372,9 @@ fun AllSongsBottomBarComponent() {
     val tabs = BottomBarTabs.values()
     val (selectedTab, setSelectedTab) = remember { mutableStateOf(AllSongs) }
     BottomAppBar(cutoutShape = CircleShape,
-        modifier = Modifier.navigationBarsHeight(additional = 56.dp)) {
+        modifier = Modifier
+            .navigationBarsHeight(additional = 56.dp)
+            .clip(RoundedCornerShape(topLeft = 16.dp, topRight = 16.dp))) {
         ConstraintLayout(modifier = Modifier
             .fillMaxWidth()
             .padding(start = 32.dp, end = 32.dp),

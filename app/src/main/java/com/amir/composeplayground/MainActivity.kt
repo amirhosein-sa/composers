@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientContext
@@ -30,6 +32,7 @@ import com.amir.base_android.Pager
 import com.amir.base_android.PagerState
 import com.amir.composeplayground.databinding.ActivityMainBinding
 import com.amir.composeplayground.ui.titlesColor
+import kotlinx.coroutines.launch
 import androidx.compose.material.Icon as materialIcon
 
 class MainActivity : AppCompatActivity() {
@@ -250,3 +253,99 @@ fun AlbumsGridPreview() {
 fun MainHeaderPreview() {
     MainScreenHeader()
 }
+
+@ExperimentalMaterialApi
+@Preview
+@Composable
+fun BottomSheetPlayGroundPreview(){
+
+    val scope = rememberCoroutineScope()
+    val scaffoldState = rememberBottomSheetScaffoldState()
+    val metrics = AmbientContext.current.resources.displayMetrics
+    val scrHeight = metrics.heightPixels / metrics.density
+
+    BottomSheetScaffold(
+        sheetContent = {
+            Box(
+                Modifier.fillMaxWidth().preferredHeight((scrHeight /3).dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Swipe up to expand sheet")
+            }
+            Column(
+                Modifier.fillMaxWidth().padding(64.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Sheet content")
+                Spacer(Modifier.preferredHeight(20.dp))
+                Button(onClick = { scaffoldState.bottomSheetState.collapse() }) {
+                    Text("Click to collapse sheet")
+                }
+            }
+        },
+        scaffoldState = scaffoldState,
+        
+        floatingActionButton = {
+            var clickCount by remember { mutableStateOf(0) }
+            FloatingActionButton(
+                onClick = {
+                    // show snackbar as a suspend function
+                    scaffoldState.bottomSheetState.expand()
+                }
+            ) {
+                Icon(Icons.Default.Favorite)
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End,
+        sheetPeekHeight = 0.dp,
+    ) { innerPadding ->
+        ScrollableColumn(contentPadding = innerPadding) {
+            repeat(100) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .preferredHeight(50.dp)
+                        .background(Color.Blue)
+                )
+            }
+        }
+    }
+
+    /*
+    *
+    * */
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

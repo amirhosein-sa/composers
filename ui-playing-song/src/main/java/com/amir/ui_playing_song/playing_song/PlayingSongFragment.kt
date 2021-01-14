@@ -56,11 +56,8 @@ import com.amir.base_android.rotation
 import com.amir.base_android.rotationTransitionDefinition
 import com.amir.base_android.Pager
 import com.amir.base_android.PagerState
-import com.amir.composeplayground.ui.purple700
-import com.amir.composeplayground.ui.titlesColor
+import com.amir.composeplayground.ui.*
 import com.amir.composeplayground.ui.util.Draw
-import com.amir.composeplayground.ui.white100
-import com.amir.composeplayground.ui.white200
 import com.amir.ui_playing_song.R
 import com.amir.ui_playing_song.playing_song.SongBottomSheetState.Closed
 import com.amir.ui_playing_song.playing_song.SongBottomSheetState.Open
@@ -108,7 +105,7 @@ class PlayingSongFragment : Fragment() {
                 val sheetState = rememberSwipeableState(initialValue = Closed)
                 val displayMetrics = resources.displayMetrics
                 val screenHeight = displayMetrics.heightPixels / displayMetrics.density
-                MaterialTheme {
+                ComposePlaygroundTheme {
                     ProvideWindowInsets {
                         Surface(modifier = Modifier
                             .fillMaxSize()
