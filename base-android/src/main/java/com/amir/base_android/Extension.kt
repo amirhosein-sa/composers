@@ -42,8 +42,7 @@ val rotationTransitionDefinition = transitionDefinition<String> {
         rotation using infiniteRepeatable(              
             animation = tween(
                 durationMillis = 15000,
-                easing = LinearEasing,
-
+                easing = LinearEasing
             )
         )
     }

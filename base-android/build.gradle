@@ -33,6 +33,14 @@ android {
             freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
         }
     }
+    composeOptions {
+        kotlinCompilerVersion "1.4.21"
+        kotlinCompilerExtensionVersion "1.0.0-alpha09"
+    }
+    buildFeatures {
+        viewBinding true
+        compose true
+    }
     kotlinOptions {
         jvmTarget = '1.8'
     }

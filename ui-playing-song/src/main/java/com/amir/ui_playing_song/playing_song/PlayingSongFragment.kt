@@ -1,8 +1,6 @@
 package com.amir.ui_playing_song.playing_song
 
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,13 +31,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.DrawStyle
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.loadImageResource
@@ -58,6 +54,8 @@ import androidx.lifecycle.MutableLiveData
 import com.amir.base_android.Songs
 import com.amir.base_android.rotation
 import com.amir.base_android.rotationTransitionDefinition
+import com.amir.base_android.Pager
+import com.amir.base_android.PagerState
 import com.amir.composeplayground.ui.purple700
 import com.amir.composeplayground.ui.titlesColor
 import com.amir.composeplayground.ui.util.Draw
@@ -66,8 +64,6 @@ import com.amir.composeplayground.ui.white200
 import com.amir.ui_playing_song.R
 import com.amir.ui_playing_song.playing_song.SongBottomSheetState.Closed
 import com.amir.ui_playing_song.playing_song.SongBottomSheetState.Open
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
 import com.chibde.visualizer.LineBarVisualizer
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.navigationBarsHeight
@@ -77,6 +73,9 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
 import kotlin.random.Random
 
 const val TAG = "com.amir.ui_playing_song.PlayingSong.PlayingSongFragment"
+
+
+// TODO: 1/14/21 Stop rotation animation based on songState and Pager's selected page
 
 lateinit var song: Songs
 
@@ -90,6 +89,7 @@ class PlayingSongFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+
         // getting arguments from deep link
         val args = requireArguments()
         val title = args.getString("songTitle")!!
@@ -98,8 +98,6 @@ class PlayingSongFragment : Fragment() {
         val songData = args.getString("songData")!!
         val dateAdded = args.getLong("dateAdded")
         val songUri = args.getString("songUri")!!
-        
-
 
 
         song = Songs(songID = id, songTitle = title, artist = artist, songData = songData,
@@ -239,22 +237,6 @@ fun reverseAlphaAnimator(): Float {
 }
 
 @Composable
-fun SongDurationsComponent() {
-    val timePassed = "01:50"
-    val songDuration = "02:48"
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
-            Text(text = timePassed,
-                textAlign = TextAlign.Center,
-                style = TextStyle(fontSize = TextUnit.Sp(12)))
-            Text(text = songDuration,
-                textAlign = TextAlign.Center,
-                style = TextStyle(fontSize = TextUnit.Sp(12)))
-        }
-    }
-}
-
-@Composable
 fun SongCoverComponent(song: Songs) {
 
     val state = transition(
@@ -263,16 +245,23 @@ fun SongCoverComponent(song: Songs) {
         toState = "B"
     )
 
+    val pagerState: PagerState = run {
+        val clock = AmbientAnimationClock.current
+        remember(clock) {
+            PagerState(clock, 0, 0, 50)
+        }
+    }
+
+
 //    var glideBitmap by remember { mutableStateOf<Bitmap?>(null) }
     val metrics = AmbientContext.current.resources.displayMetrics
     val mWidth = metrics.widthPixels / metrics.density
     Spacer(modifier = Modifier.height(2.dp))
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.shadow(elevation = 150.dp, shape = CircleShape)
+        modifier = Modifier.shadow(elevation = 150.dp)
     ) {
         val bitmap = loadImageResource(id = R.drawable.cover).resource.resource
-        CircularSeekbarComponent(mWidth / 1.25)
         /*Glide.with(AmbientContext.current).asBitmap()
             .load(song.uri)
             .into(object : CustomTarget<Bitmap>() {
@@ -286,18 +275,65 @@ fun SongCoverComponent(song: Songs) {
             })
         glideBitmap?.let {
         }*/
-        bitmap?.let {
-            songCoverRotationRadius = state[rotation]
-            Image(it,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .preferredSize((mWidth / 1.5).dp)
-                    .clip(CircleShape
-                    )
-                    .rotate(songCoverRotationRadius))
-        }
 
-        Draw(CircleShape, Color.Transparent.copy(alpha = 0.5f), (mWidth / 6).dp)
+        Pager(state = pagerState, modifier = Modifier
+            .fillMaxWidth()
+            .height((mWidth / 1.5).dp)) {
+            val isSelected = currentPage == page
+            SongCoverItemComponent(isSelected = isSelected,
+                rotateRadius = state[rotation],
+                bitmap = bitmap, width = mWidth)
+        }
+        CircularSeekbarComponent(mWidth / 1.25)
+
+    }
+}
+
+@Composable
+fun SongCoverItemComponent(
+    isSelected: Boolean,
+    rotateRadius: Float,
+    bitmap: ImageBitmap?,
+    width: Float,
+) {
+    val animateSize =
+        androidx.compose.animation.animate(if (isSelected) (width / 1.5).dp else (width / 2).dp)
+    val animateElevation = androidx.compose.animation.animate(if (isSelected) 36.dp else 0.dp)
+    Card(Modifier
+        .padding(start = 36.dp, end = 36.dp)
+        .wrapContentSize()
+        .clip(CircleShape),
+        elevation = animateElevation) {
+        Box(modifier = Modifier
+            .preferredSize(animateSize)
+            .clip(CircleShape)
+            .rotate(rotateRadius),contentAlignment = Alignment.Center) {
+
+            bitmap?.let {
+                Image(it,
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Crop)
+            }
+            Draw(CircleShape, Color.Transparent.copy(alpha = 0.5f), (width / 6).dp)
+        }
+    }
+
+}
+
+@Composable
+fun SongDurationsComponent() {
+    val timePassed = "01:50"
+    val songDuration = "02:48"
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+            Text(text = timePassed,
+                textAlign = TextAlign.Center,
+                style = TextStyle(fontSize = TextUnit.Sp(12)))
+            Text(text = songDuration,
+                textAlign = TextAlign.Center,
+                style = TextStyle(fontSize = TextUnit.Sp(12)))
+        }
     }
 }
 
