@@ -49,21 +49,7 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-@Preview
-@Composable
-fun InflatedRowPreview() {
 
-    val pagerState: PagerState = run {
-        val clock = AmbientAnimationClock.current
-        remember(clock) {
-            PagerState(clock, 0, 0, 52)
-        }
-    }
-    Pager(state = pagerState, modifier = Modifier.fillMaxSize()) {
-        val isSelected = currentPage == page
-        item(isSelected = isSelected)
-    }
-}
 
 @Composable
 fun item(isSelected: Boolean) {
@@ -76,7 +62,9 @@ fun item(isSelected: Boolean) {
     val animateElevation = if (isSelected) 12.dp else 2.dp
     bitmap?.let {
         Card(elevation = animate(animateElevation), modifier = Modifier
-            .preferredSize(animateWidth).clip(CutCornerShape(36.dp)).padding(16.dp)) {
+            .preferredSize(animateWidth)
+            .clip(CutCornerShape(36.dp))
+            .padding(16.dp)) {
             Image(bitmap = it,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop)
@@ -253,70 +241,6 @@ fun AlbumsGridPreview() {
 fun MainHeaderPreview() {
     MainScreenHeader()
 }
-
-@ExperimentalMaterialApi
-@Preview
-@Composable
-fun BottomSheetPlayGroundPreview(){
-
-    val scope = rememberCoroutineScope()
-    val scaffoldState = rememberBottomSheetScaffoldState()
-    val metrics = AmbientContext.current.resources.displayMetrics
-    val scrHeight = metrics.heightPixels / metrics.density
-
-    BottomSheetScaffold(
-        sheetContent = {
-            Box(
-                Modifier.fillMaxWidth().preferredHeight((scrHeight /3).dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Swipe up to expand sheet")
-            }
-            Column(
-                Modifier.fillMaxWidth().padding(64.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("Sheet content")
-                Spacer(Modifier.preferredHeight(20.dp))
-                Button(onClick = { scaffoldState.bottomSheetState.collapse() }) {
-                    Text("Click to collapse sheet")
-                }
-            }
-        },
-        scaffoldState = scaffoldState,
-        
-        floatingActionButton = {
-            var clickCount by remember { mutableStateOf(0) }
-            FloatingActionButton(
-                onClick = {
-                    // show snackbar as a suspend function
-                    scaffoldState.bottomSheetState.expand()
-                }
-            ) {
-                Icon(Icons.Default.Favorite)
-            }
-        },
-        floatingActionButtonPosition = FabPosition.End,
-        sheetPeekHeight = 0.dp,
-    ) { innerPadding ->
-        ScrollableColumn(contentPadding = innerPadding) {
-            repeat(100) {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .preferredHeight(50.dp)
-                        .background(Color.Blue)
-                )
-            }
-        }
-    }
-
-    /*
-    *
-    * */
-
-}
-
 
 
 

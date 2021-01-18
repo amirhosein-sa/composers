@@ -15,6 +15,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.animatedFloat
+import androidx.compose.animation.core.AnimatedFloat
+import androidx.compose.animation.core.AnimatedValue
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -31,6 +36,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -65,13 +71,13 @@ import com.amir.composeplayground.ui.purple700
 import com.amir.composeplayground.ui.white100
 import com.amir.ui_all_songs.BottomBarTabs.AllSongs
 import com.amir.ui_all_songs.BottomBarTabs.Explore
-import com.amir.ui_playing_song.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.navigationBarsHeight
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import kotlin.math.absoluteValue
 
 private val TitleHeight = 50.dp
 private val categoriesOffset = 86.dp
@@ -208,15 +214,33 @@ class AllSongsFragment : Fragment() {
         scroll: ScrollState,
         items: List<Songs>,
     ) {
+        val fabHeight = animatedFloat(initVal = 80f,)
+        val fabWidth = animatedFloat(initVal = 80f,)
+        val contentAlpha = animatedFloat(initVal = 1f)
+
+        val metrics = AmbientContext.current.resources.displayMetrics
+        val scrHeight = metrics.heightPixels / metrics.density
+        val scrWidth = metrics.widthPixels / metrics.density
+
         ScrollableColumn(scrollState = scroll) {
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .height(categoriesOffset),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically) {
-                Category(icon = Icons.Rounded.Apps)
-                Category(icon = Icons.Rounded.Favorite)
-                Category(icon = Icons.Rounded.PlaylistPlay)
+                Category(icon = Icons.Rounded.Apps){
+                    val uri = Uri.parse("smusic://AlbumsFragment/")
+                    findNavController().navigate(uri)
+                }
+                Category(icon = Icons.Rounded.Favorite){
+                    val uri = Uri.parse("smusic://FavoriteSongs/")
+                    findNavController().navigate(uri)
+                }
+                
+                Category(icon = Icons.Rounded.PlaylistPlay){
+                    val uri = Uri.parse("smusic://AllSongsPlaylists/")
+                    findNavController().navigate(uri)
+                }
             }
             Spacer(Modifier.preferredHeight(56.dp))
             items.forEach {
@@ -489,13 +513,13 @@ fun AppBarAllSongsComponent() {
 
 
 @Composable
-fun Category(icon: ImageVector, onClick: () -> Unit = {}) {
+fun Category(icon: ImageVector,onClick: () -> Unit = {}) {
     Card(
         modifier = Modifier
             .preferredSize(80.dp)
             .padding(8.dp)
             .shadow(elevation = 25.dp, shape = RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)   ,
         contentColor = purple700,
         elevation = 25.dp,
     ) {

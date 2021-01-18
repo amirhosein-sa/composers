@@ -273,6 +273,7 @@ fun SongCoverComponent(song: Songs) {
         glideBitmap?.let {
         }*/
 
+        CircularSeekbarComponent(mWidth / 1.25)
         Pager(state = pagerState, modifier = Modifier
             .fillMaxWidth()
             .height((mWidth / 1.5).dp)) {
@@ -281,7 +282,6 @@ fun SongCoverComponent(song: Songs) {
                 rotateRadius = state[rotation],
                 bitmap = bitmap, width = mWidth)
         }
-        CircularSeekbarComponent(mWidth / 1.25)
 
     }
 }
@@ -296,6 +296,7 @@ fun SongCoverItemComponent(
     val animateSize =
         androidx.compose.animation.animate(if (isSelected) (width / 1.5).dp else (width / 2).dp)
     val animateElevation = androidx.compose.animation.animate(if (isSelected) 36.dp else 0.dp)
+
     Card(Modifier
         .padding(start = 36.dp, end = 36.dp)
         .wrapContentSize()
@@ -304,7 +305,8 @@ fun SongCoverItemComponent(
         Box(modifier = Modifier
             .preferredSize(animateSize)
             .clip(CircleShape)
-            .rotate(rotateRadius),contentAlignment = Alignment.Center) {
+//            .rotate(rotateRadius)
+            ,contentAlignment = Alignment.Center) {
 
             bitmap?.let {
                 Image(it,

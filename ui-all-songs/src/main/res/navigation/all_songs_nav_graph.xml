@@ -3,38 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/all_songs_nav_graph"
     app:startDestination="@id/allSongsFragment">
-
     <fragment
         android:id="@+id/allSongsFragment"
         android:name="com.amir.ui_all_songs.AllSongsFragment"
         android:label="AllSongsFragment" >
     </fragment>
-
-    <fragment
-        android:id="@+id/playingSongFragment"
-        android:name="com.amir.ui_playing_song.playing_song.PlayingSongFragment"
-        android:label="PlayingSongFragment" >
-        <argument
-            app:argType="long"
-            android:name="songID" />
-        <argument
-            app:argType="long"
-            android:name="dateAdded" />
-        <argument
-            app:argType="string"
-            android:name="songTitle" />
-        <argument
-            app:argType="string"
-            android:name="artist" />
-        <argument
-            app:argType="string"
-            android:name="songData" />
-        <argument
-            app:argType="string"
-            android:name="songUri" />
-        
-        <deepLink app:uri="smusic://PlayingSong/{songID}/{songTitle}/{artist}/{songData}/{dateAdded}/{songUri}" />
-
-    </fragment>
-
 </navigation>

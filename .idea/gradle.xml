@@ -14,6 +14,9 @@
             <option value="$PROJECT_DIR$/base-android" />
             <option value="$PROJECT_DIR$/common-ui-resources" />
             <option value="$PROJECT_DIR$/ui-all-songs" />
+            <option value="$PROJECT_DIR$/ui-all-songs-albums" />
+            <option value="$PROJECT_DIR$/ui-all-songs-favorite-songs" />
+            <option value="$PROJECT_DIR$/ui-all-songs-playlists" />
             <option value="$PROJECT_DIR$/ui-playing-song" />
             <option value="$PROJECT_DIR$/ui-playing-song-playlist" />
           </set>

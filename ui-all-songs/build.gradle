@@ -48,6 +48,5 @@ android {
 dependencies {
     implementation project(':base-android')
     implementation project(':common-ui-resources')
-    implementation project(':ui-playing-song')
 
 }

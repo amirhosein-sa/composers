@@ -7,5 +7,9 @@
 
     <include app:graph = "@navigation/all_songs_nav_graph"/>
     <include app:graph = "@navigation/playing_song_nav_graph"/>
+    <include app:graph = "@navigation/all_songs_playlists_nav_graph"/>
+    <include app:graph = "@navigation/all_songs_albums_nav_graph"/>
+    <include app:graph = "@navigation/all_songs_favorites_nav_graph"/>
+
 
 </navigation>

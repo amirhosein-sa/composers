@@ -58,6 +58,10 @@ dependencies {
     implementation project(":base-android")
     implementation project(':ui-all-songs')
     implementation project(':ui-playing-song')
+    implementation project(':ui-all-songs-playlists')
+    implementation project(':ui-all-songs-favorite-songs')
+    implementation project(':ui-all-songs-albums')
+
 
     testImplementation 'junit:junit:4.13.1'
 }
