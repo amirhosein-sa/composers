@@ -233,6 +233,25 @@ fun reverseAlphaAnimator(): Float {
     return animatedAlpha.value
 }
 
+
+@Composable
+fun songCoverAnimator(): Float {
+    val radius = animatedFloat(0f)
+    if (playing){
+        radius.animateTo(
+            targetValue = 360f,
+            anim = infiniteRepeatable(
+                animation =
+                tween(durationMillis = 10000, easing = LinearEasing),
+            )
+        )
+
+    }else {
+        radius.stop()
+    }
+    return radius.value
+}
+
 @Composable
 fun SongCoverComponent(song: Songs) {
 
@@ -241,6 +260,8 @@ fun SongCoverComponent(song: Songs) {
         initState = "A",
         toState = "B"
     )
+
+    val radius = animatedFloat(initVal = 0f)
 
     val pagerState: PagerState = run {
         val clock = AmbientAnimationClock.current
@@ -305,8 +326,8 @@ fun SongCoverItemComponent(
         Box(modifier = Modifier
             .preferredSize(animateSize)
             .clip(CircleShape)
-//            .rotate(rotateRadius)
-            ,contentAlignment = Alignment.Center) {
+            .rotate(songCoverAnimator())
+            , contentAlignment = Alignment.Center) {
 
             bitmap?.let {
                 Image(it,
@@ -467,19 +488,20 @@ fun SongControllersComponent() {
     }
 }
 
+var playing by mutableStateOf(true)
+
 
 @Composable
 fun PlayPauseButton() {
-    val isPlaying = remember { mutableStateOf(true) }
+    val isPlaying = remember { playing }
     val playPauseIcon =
-        if (isPlaying.value) Icons.Rounded.Pause else Icons.Rounded.PlayArrow
+        if (playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow
     Surface(
         modifier = Modifier
             .padding(all = 16.dp)
             .clip(RoundedCornerShape(8.dp))
             .clickable(onClick = {
-                isPlaying.value = !isPlaying.value
-
+                playing = !playing
             }),
         color = purple700
     ) {

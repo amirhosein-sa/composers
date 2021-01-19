@@ -16,10 +16,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animatedFloat
-import androidx.compose.animation.core.AnimatedFloat
-import androidx.compose.animation.core.AnimatedValue
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -83,6 +80,9 @@ private val TitleHeight = 50.dp
 private val categoriesOffset = 86.dp
 
 class AllSongsFragment : Fragment() {
+
+
+
     @ExperimentalMaterialApi
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreateView(
@@ -214,13 +214,12 @@ class AllSongsFragment : Fragment() {
         scroll: ScrollState,
         items: List<Songs>,
     ) {
-        val fabHeight = animatedFloat(initVal = 80f,)
-        val fabWidth = animatedFloat(initVal = 80f,)
-        val contentAlpha = animatedFloat(initVal = 1f)
-
-        val metrics = AmbientContext.current.resources.displayMetrics
-        val scrHeight = metrics.heightPixels / metrics.density
-        val scrWidth = metrics.widthPixels / metrics.density
+        val navOption = DefaultNavOptions(
+            enterAnim = R.anim.from_end,
+            popExitAnim = R.anim.to_end,
+            popEnterAnim = R.anim.from_end,
+            exitAnim = R.anim.to_end
+        )
 
         ScrollableColumn(scrollState = scroll) {
             Row(modifier = Modifier
@@ -230,16 +229,16 @@ class AllSongsFragment : Fragment() {
                 verticalAlignment = Alignment.CenterVertically) {
                 Category(icon = Icons.Rounded.Apps){
                     val uri = Uri.parse("smusic://AlbumsFragment/")
-                    findNavController().navigate(uri)
+                    findNavController().navigate(uri, navOption)
                 }
                 Category(icon = Icons.Rounded.Favorite){
                     val uri = Uri.parse("smusic://FavoriteSongs/")
-                    findNavController().navigate(uri)
+                    findNavController().navigate(uri, navOption)
                 }
                 
                 Category(icon = Icons.Rounded.PlaylistPlay){
                     val uri = Uri.parse("smusic://AllSongsPlaylists/")
-                    findNavController().navigate(uri)
+                    findNavController().navigate(uri, navOption)
                 }
             }
             Spacer(Modifier.preferredHeight(56.dp))
@@ -251,8 +250,12 @@ class AllSongsFragment : Fragment() {
 
     @Composable
     fun AllSongsItemComponent(song: Songs) {
+
         val bitmap = loadImageResource(id = R.drawable.cover).resource.resource
         var glideBitmap by remember { mutableStateOf<Bitmap?>(null) }
+        val navOption =
+            DefaultNavOptions(enterAnim = R.anim.from_botom, popExitAnim = R.anim.to_bottom)
+
         Glide.with(AmbientContext.current).asBitmap()
             .load(if (Uri.EMPTY != song.uri) song.uri else bitmap)
             .into(object : CustomTarget<Bitmap>() {
@@ -271,8 +274,7 @@ class AllSongsFragment : Fragment() {
 //                val allSongsToPlayingSongBundle = bundleOf("selectedSong" to song)
 
                 /*  smusic://PlayingSong/{songID}/{songTitle}/{artist}/{songData}/{dateAdded}/{songUri}"  */
-                val navOption =
-                    DefaultNavOptions(enterAnim = R.anim.from_botom, popExitAnim = R.anim.to_bottom)
+
                 val uri =
                     Uri.parse("smusic://PlayingSong/${song.songID}/${song.songTitle}/${song.artist}/${song.songData}/${song.dateAdded}/${song.uri.toString()}")
                 findNavController().navigate(uri, navOption)
@@ -512,14 +514,25 @@ fun AppBarAllSongsComponent() {
 }
 
 
+
+
 @Composable
 fun Category(icon: ImageVector,onClick: () -> Unit = {}) {
+
+    val fabHeight = animatedFloat(initVal = 80f,)
+    val fabWidth = animatedFloat(initVal = 80f,)
+    val contentAlpha = animatedFloat(initVal = 1f)
+
+    val metrics = AmbientContext.current.resources.displayMetrics
+    val scrHeight = metrics.heightPixels / metrics.density
+    val scrWidth = metrics.widthPixels / metrics.density
+
     Card(
         modifier = Modifier
             .preferredSize(80.dp)
             .padding(8.dp)
             .shadow(elevation = 25.dp, shape = RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick)   ,
+            .clickable(onClick = onClick),
         contentColor = purple700,
         elevation = 25.dp,
     ) {
