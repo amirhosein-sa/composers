@@ -215,10 +215,11 @@ class AllSongsFragment : Fragment() {
         items: List<Songs>,
     ) {
         val navOption = DefaultNavOptions(
-            enterAnim = R.anim.from_end,
+            // FIXME: 1/25/21 Create custom animations for navigate between composables
+            /*enterAnim = R.anim.from_end,
             popExitAnim = R.anim.to_end,
             popEnterAnim = R.anim.from_end,
-            exitAnim = R.anim.to_end
+            exitAnim = R.anim.to_end*/
         )
 
         ScrollableColumn(scrollState = scroll) {
