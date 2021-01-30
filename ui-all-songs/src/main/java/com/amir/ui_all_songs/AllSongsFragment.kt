@@ -20,11 +20,9 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.material.
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -33,7 +31,6 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -41,7 +38,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.AmbientDensity
@@ -74,7 +70,6 @@ import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.navigationBarsHeight
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
-import kotlin.math.absoluteValue
 
 private val TitleHeight = 50.dp
 private val categoriesOffset = 86.dp
@@ -103,6 +98,7 @@ class AllSongsFragment : Fragment() {
                                 FloatingActionButton(
                                     onClick = {},
                                 ) {
+
                                     Icon(imageVector = Icons.Rounded.PlayCircleOutline)
                                 }
                             },
@@ -228,16 +224,16 @@ class AllSongsFragment : Fragment() {
                 .height(categoriesOffset),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically) {
-                Category(icon = Icons.Rounded.Apps){
+                Category(icon = Icons.Rounded.Apps,scroll){
                     val uri = Uri.parse("smusic://AlbumsFragment/")
                     findNavController().navigate(uri, navOption)
                 }
-                Category(icon = Icons.Rounded.Favorite){
+                Category(icon = Icons.Rounded.Favorite,scroll){
                     val uri = Uri.parse("smusic://FavoriteSongs/")
                     findNavController().navigate(uri, navOption)
                 }
-                
-                Category(icon = Icons.Rounded.PlaylistPlay){
+
+                Category(icon = Icons.Rounded.PlaylistPlay,scroll){
                     val uri = Uri.parse("smusic://AllSongsPlaylists/")
                     findNavController().navigate(uri, navOption)
                 }
@@ -518,14 +514,17 @@ fun AppBarAllSongsComponent() {
 
 
 @Composable
-fun Category(icon: ImageVector,onClick: () -> Unit = {}) {
+fun Category(icon: ImageVector,state:ScrollState,onClick: () -> Unit = {}) {
 
     val fabHeight = animatedFloat(initVal = 80f,)
     val fabWidth = animatedFloat(initVal = 80f,)
     val contentAlpha = animatedFloat(initVal = 1f)
+    val maxElevation = 45.dp
+    val minElevation = 2.dp
+    val elevation = (maxElevation - state.value.dp).coerceAtLeast(minElevation)
 
     val metrics = AmbientContext.current.resources.displayMetrics
-    val scrHeight = metrics.heightPixels / metrics.density
+    val Height = metrics.heightPixels / metrics.density
     val scrWidth = metrics.widthPixels / metrics.density
 
     Card(
@@ -535,7 +534,7 @@ fun Category(icon: ImageVector,onClick: () -> Unit = {}) {
             .shadow(elevation = 25.dp, shape = RoundedCornerShape(8.dp))
             .clickable(onClick = onClick),
         contentColor = purple700,
-        elevation = 25.dp,
+        elevation = elevation,
     ) {
         Box {
             Icon(imageVector = icon, modifier = Modifier.align(Alignment.Center))

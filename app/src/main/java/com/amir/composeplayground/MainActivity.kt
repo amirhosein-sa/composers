@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -17,9 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.loadImageResource
 import androidx.compose.ui.text.TextStyle
@@ -28,11 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.amir.base_android.Pager
-import com.amir.base_android.PagerState
 import com.amir.composeplayground.databinding.ActivityMainBinding
 import com.amir.composeplayground.ui.titlesColor
-import kotlinx.coroutines.launch
 import androidx.compose.material.Icon as materialIcon
 
 class MainActivity : AppCompatActivity() {
@@ -49,12 +43,10 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-
-
 @Composable
 fun item(isSelected: Boolean) {
-    val resources = AmbientContext.current.resources
-    val displayMetrics = resources.displayMetrics
+    val context = AmbientContext.current.resources
+    val displayMetrics = context.displayMetrics
     val scrWidth = displayMetrics.widthPixels / displayMetrics.density
     val bitmap = loadImageResource(id = R.drawable.cover).resource.resource
     val animateHeight = animate(if (isSelected) 645.dp else 360.dp)

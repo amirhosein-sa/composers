@@ -63,7 +63,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    api "dev.chrisbanes.accompanist:accompanist-insets:0.4.1"
+    api "dev.chrisbanes.accompanist:accompanist-insets:0.4.2"
 
     /* Fragment and activity dependencies to come over 'prepereCall' apis */
     api "androidx.activity:activity-ktx:1.2.0-rc01"
