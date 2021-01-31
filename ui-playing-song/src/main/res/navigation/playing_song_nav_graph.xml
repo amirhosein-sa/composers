@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/playingSongFragment"
-        android:name="com.amir.ui_playing_song.playing_song.PlayingSongFragment"
+        android:name="com.smusic.ui_playing_song.playing_song.PlayingSongFragment"
         android:label="PlayingSongFragment" >
         <argument
             app:argType="long"

@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/allSongsPlaylistsFragment"
-        android:name="com.amir.ui_all_songs_playlists.AllSongsPlaylistsFragment"
+        android:name="com.smusic.ui_all_songs_playlists.AllSongsPlaylistsFragment"
         android:label="AllSongsPlaylistsFragment" >
         <deepLink app:uri="smusic://AllSongsPlaylists/"/>
     </fragment>

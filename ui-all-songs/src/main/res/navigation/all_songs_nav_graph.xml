@@ -5,7 +5,7 @@
     app:startDestination="@id/allSongsFragment">
     <fragment
         android:id="@+id/allSongsFragment"
-        android:name="com.amir.ui_all_songs.AllSongsFragment"
+        android:name="com.smusic.ui_all_songs.AllSongsFragment"
         android:label="AllSongsFragment" >
     </fragment>
 </navigation>
