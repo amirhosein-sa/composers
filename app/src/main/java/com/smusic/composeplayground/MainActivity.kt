@@ -2,7 +2,6 @@ package com.smusic.composeplayground
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.animate
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -22,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.res.loadImageResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,11 +41,32 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.myView)
+        /*binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.myView)*/
+        setContent {
+
+// Here the result will be a 20.dp x 50.dp blue box centered vertically in a 50.dp x 50.dp
+// space. Because of the preferredSize modifier, if wrapContentWidth did not exist,
+// the blue rectangle would actually be 50.dp x 50.dp to satisfy the size set by the modifier.
+// However, because we provide wrapContentWidth, the blue rectangle is specified to be wrap
+// content in width - if the desired width is smaller than 50.dp, it will be centered
+// horizontally in this space. Therefore the 50.dp x 20.dp is centered horizontally
+// in the space.
+            Column(
+                Modifier.preferredSize(50.dp)
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+                    .preferredWidth(450.dp)
+                    .background(Color.Red)
+            ){
+                Text(text = "Test",modifier = Modifier.preferredWidth(300.dp).background(Color.Gray))
+                Text(text = "Test",modifier = Modifier.preferredWidth(50.dp) .background(Color.Blue))
+            }
+
+        }
+
     }
 
-                                                                                             
+
 }
 
 @Composable
@@ -217,7 +238,7 @@ fun SingerItem(songName: String, singerName: String) {
                 bottomLeft = 16f,
                 bottomRight = 32f)) {
             bm?.let {
-                Image(it,contentDescription = null, contentScale = ContentScale.Crop)
+                Image(it, contentDescription = null, contentScale = ContentScale.Crop)
             }
         }
         Providers(AmbientContentAlpha provides ContentAlpha.high) {

@@ -73,8 +73,8 @@ private val categoriesOffset = 86.dp
 class AllSongsFragment : Fragment() {
     @ExperimentalMaterialApi
     @RequiresApi(Build.VERSION_CODES.M)
-        inflater: LayoutInflater, container: ViewGroup?,
     override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         val mockData = mockGenerator()
