@@ -16,6 +16,7 @@
             <option value="$PROJECT_DIR$/common-ui-resources" />
             <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/domain" />
+            <option value="$PROJECT_DIR$/model" />
             <option value="$PROJECT_DIR$/ui-all-songs" />
             <option value="$PROJECT_DIR$/ui-all-songs-albums" />
             <option value="$PROJECT_DIR$/ui-all-songs-favorite-songs" />

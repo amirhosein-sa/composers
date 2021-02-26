@@ -11,3 +11,5 @@ include ':ui-all-songs-albums'
 include ':domain'
 include ':data'
 include ':base'
+include ':model'
+

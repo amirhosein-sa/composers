@@ -1,6 +1,6 @@
 package com.smusic.ui_all_songs
 
-import android.Manifest
+/*import android.Manifest
 import android.content.ContentUris
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -61,12 +61,14 @@ import com.smusic.base_android.Songs
 import com.smusic.composeplayground.ui.ComposePlaygroundTheme
 import com.smusic.composeplayground.ui.purple700
 import com.smusic.composeplayground.ui.white100
-import com.smusic.ui_all_songs.BottomBarTabs.*
+import dagger.hilt.EntryPoint
+import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.navigationBarsHeight
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
-import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import dev.chrisbanes.accompanist.insets.statusBarsPadding*/
 
+/*
 private val TitleHeight = 50.dp
 private val categoriesOffset = 86.dp
 
@@ -98,7 +100,9 @@ class AllSongsFragment : Fragment() {
                             floatingActionButtonPosition = FabPosition.Center,
                             isFloatingActionButtonDocked = true,
                             bottomBar = { AllSongsBottomBarComponent() }) {
-                            /* fixme: Handle fetching songs and granting permissions in splash screen */
+                            */
+/* fixme: Handle fetching songs and granting permissions in splash screen *//*
+
                             askForPermissions()
                             AllSongsColumnComponent(items = mockData)
                         }
@@ -134,51 +138,6 @@ class AllSongsFragment : Fragment() {
         }
     }
 
-    private fun getSongs(): List<Songs> {
-        val songList = ArrayList<Songs>()
-        val contentResolver = activity?.contentResolver
-        val songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        val selection = MediaStore.Audio.Media.IS_MUSIC + "!=0"
-        val songCursor = contentResolver?.query(
-            songUri,
-            null,
-            selection,
-            null,
-            null
-        )
-        if (songCursor != null && songCursor.moveToFirst()) {
-            val sArtWorkUri = Uri.parse("content://media/external/audio/albumart")
-            val songId = songCursor.getColumnIndex(MediaStore.Audio.Media._ID)
-            val songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
-            val songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
-            val songData = songCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-            val dateIndex = songCursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)
-            val albumColumn = songCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
-            while (songCursor.moveToNext()) {
-                val currentId = songCursor.getLong(songId)
-                val currentTitle = songCursor.getString(songTitle)
-                val currentArtist = songCursor.getString(songArtist)
-                val currentData = songCursor.getString(songData)
-                val currentDate = songCursor.getLong(dateIndex)
-                val songAlbum = songCursor.getLong(albumColumn)
-                val uri = ContentUris.withAppendedId(sArtWorkUri, songAlbum)
-                songList.add(
-                    Songs(
-                        currentId,
-                        currentTitle,
-                        currentArtist,
-                        currentData,
-                        currentDate,
-                        uri
-                    )
-                )
-            }
-        }
-        songCursor?.close()
-        return songList
-    }
-
-
     @Composable
     fun AllSongsColumnComponent(items: List<Songs>) {
         if (items.isEmpty()) {
@@ -191,11 +150,13 @@ class AllSongsFragment : Fragment() {
                 Body(scroll, items)
                 Header(scroll.value)
             }
-            /*LazyColumn(content = {
+            */
+/*LazyColumn(content = {
                 items(items) { song ->
                     AllSongsItemComponent(song)
                 }
-            })*/
+            })*//*
+
         }
     }
 
@@ -206,10 +167,12 @@ class AllSongsFragment : Fragment() {
     ) {
         val navOption = DefaultNavOptions(
             // FIXME: 1/25/21 Create custom animations for navigate between composables
-            /*enterAnim = R.anim.from_end,
+            */
+/*enterAnim = R.anim.from_end,
             popExitAnim = R.anim.to_end,
             popEnterAnim = R.anim.from_end,
-            exitAnim = R.anim.to_end*/
+            exitAnim = R.anim.to_end*//*
+
         )
 
         ScrollableColumn(scrollState = scroll) {
@@ -339,7 +302,9 @@ class AllSongsFragment : Fragment() {
                 shuffleVector?.let {
                     Surface(modifier = Modifier
                         .clickable(
-                            onClick = { /*TODO*/ })) {
+                            onClick = { */
+/*TODO*//*
+ })) {
                         Icon(imageVector = it, modifier = Modifier
                             .padding(8.dp))
                     }
@@ -347,7 +312,9 @@ class AllSongsFragment : Fragment() {
                 hotVector?.let {
                     Surface(modifier = Modifier
                         .clickable(
-                            onClick = { /*TODO*/ })
+                            onClick = { */
+/*TODO*//*
+ })
                     ) {
                         Icon(imageVector = it, modifier = Modifier
                             .padding(8.dp))
@@ -357,7 +324,9 @@ class AllSongsFragment : Fragment() {
                 sortVector?.let {
                     Surface(modifier = Modifier
                         .clickable(
-                            onClick = { /*TODO*/ })) {
+                            onClick = { */
+/*TODO*//*
+ })) {
                         Icon(imageVector = it, modifier = Modifier
                             .padding(8.dp))
                     }
@@ -543,3 +512,4 @@ private enum class BottomBarTabs(
 }
 
 
+*/
