@@ -1,3 +1,0 @@
-TODOs:
-1. Bring clean architecture based on tivi (well, mostly!)
-2. ...
