@@ -2,18 +2,18 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.8">
-      <module name="Compose_Playground.app" target="15" />
-      <module name="Compose_Playground.base-android" target="15" />
-      <module name="Compose_Playground.common-ui-resources" target="15" />
-      <module name="Compose_Playground.data" target="15" />
-      <module name="Compose_Playground.domain" target="15" />
-      <module name="Compose_Playground.model" target="15" />
-      <module name="Compose_Playground.ui-all-songs" target="15" />
-      <module name="Compose_Playground.ui-all-songs-albums" target="15" />
-      <module name="Compose_Playground.ui-all-songs-favorite-songs" target="15" />
-      <module name="Compose_Playground.ui-all-songs-playlists" target="15" />
-      <module name="Compose_Playground.ui-playing-song" target="15" />
-      <module name="Compose_Playground.ui-playing-song-playlist" target="15" />
+      <module name="Compose_Playground.app" target="11" />
+      <module name="Compose_Playground.base-android" target="11" />
+      <module name="Compose_Playground.common-ui-resources" target="11" />
+      <module name="Compose_Playground.data" target="11" />
+      <module name="Compose_Playground.domain" target="11" />
+      <module name="Compose_Playground.model" target="11" />
+      <module name="Compose_Playground.ui-all-songs" target="11" />
+      <module name="Compose_Playground.ui-all-songs-albums" target="11" />
+      <module name="Compose_Playground.ui-all-songs-favorite-songs" target="11" />
+      <module name="Compose_Playground.ui-all-songs-playlists" target="11" />
+      <module name="Compose_Playground.ui-playing-song" target="11" />
+      <module name="Compose_Playground.ui-playing-song-playlist" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -1,23 +1,23 @@
 package com.smusic.ui_all_songs
 
-/*import android.Manifest
-import android.content.ContentUris
+import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.animatedFloat
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -36,19 +36,18 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.loadImageResource
-import androidx.compose.ui.res.loadVectorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -61,14 +60,9 @@ import com.smusic.base_android.Songs
 import com.smusic.composeplayground.ui.ComposePlaygroundTheme
 import com.smusic.composeplayground.ui.purple700
 import com.smusic.composeplayground.ui.white100
-import dagger.hilt.EntryPoint
-import dagger.hilt.android.AndroidEntryPoint
-import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
-import dev.chrisbanes.accompanist.insets.navigationBarsHeight
-import dev.chrisbanes.accompanist.insets.navigationBarsPadding
-import dev.chrisbanes.accompanist.insets.statusBarsPadding*/
+import com.smusic.ui_all_songs.BottomBarTabs.AllSongs
+import com.smusic.ui_all_songs.BottomBarTabs.Explore
 
-/*
 private val TitleHeight = 50.dp
 private val categoriesOffset = 86.dp
 
@@ -83,10 +77,10 @@ class AllSongsFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 ComposePlaygroundTheme {
-                    ProvideWindowInsets {
+//                    ProvideWindowInsets {
                         Scaffold(modifier = Modifier
                             .fillMaxSize()
-                            .statusBarsPadding()
+//                            .statusBarsPadding()
                             .background(white100),
                             topBar = { AppBarAllSongsComponent() },
                             floatingActionButton = {
@@ -94,19 +88,18 @@ class AllSongsFragment : Fragment() {
                                     onClick = {},
                                 ) {
 
-                                    Icon(imageVector = Icons.Rounded.PlayCircleOutline)
+                                    Icon(imageVector = Icons.Rounded.PlayCircleOutline,contentDescription = null)
                                 }
                             },
                             floatingActionButtonPosition = FabPosition.Center,
                             isFloatingActionButtonDocked = true,
                             bottomBar = { AllSongsBottomBarComponent() }) {
-                            */
-/* fixme: Handle fetching songs and granting permissions in splash screen *//*
+
 
                             askForPermissions()
                             AllSongsColumnComponent(items = mockData)
                         }
-                    }
+//                    }
                 }
             }
         }
@@ -146,16 +139,17 @@ class AllSongsFragment : Fragment() {
             }
         } else {
             Box(modifier = Modifier.fillMaxSize()) {
-                val scroll = rememberScrollState(0f)
+                val scroll = rememberScrollState(0)
                 Body(scroll, items)
-                Header(scroll.value)
+                Header(scroll.value.toFloat())
             }
-            */
-/*LazyColumn(content = {
+
+            LazyColumn(content = {
                 items(items) { song ->
                     AllSongsItemComponent(song)
                 }
-            })*//*
+            })
+
 
         }
     }
@@ -167,15 +161,16 @@ class AllSongsFragment : Fragment() {
     ) {
         val navOption = DefaultNavOptions(
             // FIXME: 1/25/21 Create custom animations for navigate between composables
-            */
-/*enterAnim = R.anim.from_end,
+
+        /*enterAnim = R.anim.from_end,
             popExitAnim = R.anim.to_end,
             popEnterAnim = R.anim.from_end,
-            exitAnim = R.anim.to_end*//*
+            exitAnim = R.anim.to_end*/
+
 
         )
 
-        ScrollableColumn(scrollState = scroll) {
+        Column(modifier = Modifier.verticalScroll(scroll)) {
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .height(categoriesOffset),
@@ -195,7 +190,7 @@ class AllSongsFragment : Fragment() {
                     findNavController().navigate(uri, navOption)
                 }
             }
-            Spacer(Modifier.preferredHeight(56.dp))
+            Spacer(Modifier.height(56.dp))
             items.forEach {
                 AllSongsItemComponent(song = it)
             }
@@ -205,12 +200,12 @@ class AllSongsFragment : Fragment() {
     @Composable
     fun AllSongsItemComponent(song: Songs) {
 
-        val bitmap = loadImageResource(id = R.drawable.cover).resource.resource
-        var glideBitmap by remember { mutableStateOf<Bitmap?>(null) }
+        val bitmap = painterResource(id = R.drawable.cover)
+        val glideBitmap = remember { mutableStateOf<Bitmap?>(null) }
         val navOption =
             DefaultNavOptions(enterAnim = R.anim.from_botom, popExitAnim = R.anim.to_bottom)
 
-        Glide.with(AmbientContext.current).asBitmap()
+        Glide.with(LocalContext.current).asBitmap()
             .load(if (Uri.EMPTY != song.uri) song.uri else bitmap)
             .into(object : CustomTarget<Bitmap>() {
                 override fun onLoadCleared(placeholder: Drawable?) {}
@@ -218,7 +213,7 @@ class AllSongsFragment : Fragment() {
                     resource: Bitmap,
                     transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?,
                 ) {
-                    glideBitmap = resource
+                    glideBitmap.value = resource
                 }
             })
 
@@ -230,20 +225,20 @@ class AllSongsFragment : Fragment() {
                 findNavController().navigate(uri, navOption)
             })
             .padding(4.dp), horizontalArrangement = Arrangement.Start) {
-            glideBitmap?.let {
-                Image(
-                    bitmap = it.asImageBitmap(),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .preferredSize(48.dp)
-                        .clip(
-                            RoundedCornerShape(4.dp))
-                )
+                glideBitmap.value?.asImageBitmap()?.let {
+                    Image(
+                        bitmap = it,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                    )
+                }
 
 
-                Column(modifier = Modifier.preferredHeight(48.dp),
+                Column(modifier = Modifier.height(48.dp),
                     horizontalAlignment = Alignment.Start) {
                     Text(text = song.songTitle,
                         textAlign = TextAlign.Start,
@@ -252,9 +247,9 @@ class AllSongsFragment : Fragment() {
                             .padding(4.dp),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = TextUnit.Sp(15),
+                        fontSize = 15.sp,
                         softWrap = true)
-                    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         Text(text = song.artist,
                             textAlign = TextAlign.Start,
                             overflow = TextOverflow.Ellipsis,
@@ -262,10 +257,9 @@ class AllSongsFragment : Fragment() {
                                 .layoutId("singerName")
                                 .padding(4.dp),
                             maxLines = 1,
-                            style = TextStyle(fontSize = TextUnit.Sp(12)),
+                            fontSize = 12.sp,
                             softWrap = true)
                     }
-                }
             }
             Divider(modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp))
@@ -276,14 +270,14 @@ class AllSongsFragment : Fragment() {
 
     @Composable
     fun Header(scroll: Float) {
-        val maxOffset = with(AmbientDensity.current) { categoriesOffset.toPx() }
-        val minOffset = with(AmbientDensity.current) { 0.5.dp.toPx() }
+        val maxOffset = with(LocalDensity.current) { categoriesOffset.toPx() }
+        val minOffset = with(LocalDensity.current) { 0.5.dp.toPx() }
         val offset = (maxOffset - scroll).coerceAtLeast(minOffset)
         Row(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .preferredHeightIn(min = 56.dp)
+                .heightIn(min = 56.dp)
                 .graphicsLayer { translationY = offset }
                 .fillMaxWidth()
                 .background(white100)
@@ -296,41 +290,34 @@ class AllSongsFragment : Fragment() {
 
             Row(modifier = Modifier
                 .padding(end = 16.dp, bottom = 8.dp)) {
-                val hotVector = loadVectorResource(id = R.drawable.hot_songs_16).resource.resource
-                val shuffleVector = loadVectorResource(id = R.drawable.shuffle_16).resource.resource
-                val sortVector = loadVectorResource(id = R.drawable.round_sort_16).resource.resource
-                shuffleVector?.let {
+                val hotVector = painterResource(id = R.drawable.hot_songs_16)
+                val shuffleVector = painterResource(id = R.drawable.shuffle_16)
+                val sortVector = painterResource(id = R.drawable.round_sort_16)
                     Surface(modifier = Modifier
                         .clickable(
-                            onClick = { */
-/*TODO*//*
- })) {
-                        Icon(imageVector = it, modifier = Modifier
+                            onClick = {
+
+                            })) {
+                        Icon(contentDescription = null,painter = shuffleVector, modifier = Modifier
                             .padding(8.dp))
                     }
-                }
-                hotVector?.let {
                     Surface(modifier = Modifier
                         .clickable(
-                            onClick = { */
-/*TODO*//*
- })
+                            onClick = {
+
+                            })
                     ) {
-                        Icon(imageVector = it, modifier = Modifier
+                        Icon(contentDescription = null,painter = sortVector, modifier = Modifier
                             .padding(8.dp))
                     }
 
-                }
-                sortVector?.let {
                     Surface(modifier = Modifier
                         .clickable(
-                            onClick = { */
-/*TODO*//*
- })) {
-                        Icon(imageVector = it, modifier = Modifier
+                            onClick = {
+                            })) {
+                        Icon(contentDescription = null,painter = sortVector, modifier = Modifier
                             .padding(8.dp))
                     }
-                }
             }
         }
     }
@@ -343,7 +330,7 @@ class AllSongsFragment : Fragment() {
                 artist = "Artist $i",
                 songData = "Data $i",
                 dateAdded = i.toLong(),
-                uri = "dujfhsdajgf".toUri()))
+                uri = "someUri".toUri()))
         return l
     }
 
@@ -351,15 +338,16 @@ class AllSongsFragment : Fragment() {
     @Preview
     @Composable
     fun AllSongsBottomBarComponent() {
-        val tabs = values()
         val (selectedTab, setSelectedTab) = remember { mutableStateOf(AllSongs) }
         BottomAppBar(cutoutShape = CircleShape,
             modifier = Modifier
-                .navigationBarsHeight(additional = 56.dp)
-                .clip(RoundedCornerShape(topLeft = 16.dp, topRight = 16.dp))) {
-            ConstraintLayout(modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 32.dp, end = 32.dp),
+//                .navigationBarsHeight(additional = 56.dp)
+                .clip(RoundedCornerShape(topStart = 16.dp,topEnd = 16.dp))
+        ) {
+            ConstraintLayout(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 32.dp, end = 32.dp),
                 constraintSet = ConstraintSet {
                     val myMusic = createRefFor("myMusic")
                     val explore = createRefFor("explore")
@@ -377,29 +365,25 @@ class AllSongsFragment : Fragment() {
             ) {
                 BottomNavigationItem(
                     modifier = Modifier
-                        .layoutId("myMusic")
-                        .navigationBarsPadding(),
-                    icon = {
-                        Icon(AllSongs.icon)
-                    },
+//                        .navigationBarsPadding()
+                        .layoutId("myMusic"),
+                    icon = {Icon(AllSongs.icon,contentDescription = null)},
                     label = { Text(AllSongs.title) },
-                    alwaysShowLabels = false,
+                    alwaysShowLabel = false,
                     selectedContentColor = Color.White,
-                    unselectedContentColor = androidx.compose.material.AmbientContentColor.current,
+                    unselectedContentColor = LocalContentColor.current,
                     selected = AllSongs == selectedTab,
                     onClick = { setSelectedTab(AllSongs) })
 
                 BottomNavigationItem(
                     modifier = Modifier
-                        .layoutId("explore")
-                        .navigationBarsPadding(),
-                    icon = {
-                        Icon(Explore.icon)
-                    },
+                        .layoutId("explore"),
+//                        .navigationBarsPadding(),
+                    icon = { Icon(Explore.icon, contentDescription = null) },
                     label = { Text(Explore.title) },
-                    alwaysShowLabels = false,
+                    alwaysShowLabel = false,
                     selectedContentColor = Color.White,
-                    unselectedContentColor = androidx.compose.material.AmbientContentColor.current,
+                    unselectedContentColor = LocalContentColor.current,
                     selected = Explore == selectedTab,
                     onClick = { setSelectedTab(Explore) })
             }
@@ -422,14 +406,14 @@ fun onQueryTextSubmit(query: String?): Boolean {
 fun SearchFieldComponent() {
 //    val textController = remember { mutableStateOf(TextFieldValue()) }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        AndroidView(modifier = Modifier.weight(1f), viewBlock = {
+        AndroidView(modifier = Modifier.weight(1f), factory = {
             EditText(it).apply {
                 hint = "Search Library"
                 maxLines = 1
                 ellipsize = TextUtils.TruncateAt.END
             }
         })
-        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Surface(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
@@ -437,8 +421,7 @@ fun SearchFieldComponent() {
                     }),
                 color = Color.White
             ) {
-                Icon(Icons.Default.Search,
-                    modifier = Modifier.padding(8.dp))
+                Icon(Icons.Default.Search,contentDescription = null, modifier = Modifier.padding(8.dp))
             }
 
         }
@@ -463,6 +446,7 @@ fun AppBarAllSongsComponent() {
             color = Color.White
         ) {
             Icon(Icons.Default.Settings,
+                contentDescription = null,
                 modifier = Modifier.padding(8.dp))
         }
         SearchFieldComponent()
@@ -472,22 +456,22 @@ fun AppBarAllSongsComponent() {
 
 
 @Composable
-fun Category(icon: ImageVector, state: ScrollState, onClick: () -> Unit = {}) {
-
-    val fabHeight = animatedFloat(initVal = 80f)
-    val fabWidth = animatedFloat(initVal = 80f)
-    val contentAlpha = animatedFloat(initVal = 1f)
+ fun Category(icon: ImageVector, state: ScrollState, onClick: () -> Unit = {}) {
+    val coroutineScope = rememberCoroutineScope()
+    val fabHeight = Animatable(80f)
+    val fabWidth = Animatable( 80f)
+    val contentAlpha = Animatable( 1f)
     val maxElevation = 45.dp
     val minElevation = 2.dp
     val elevation = (maxElevation - state.value.dp).coerceAtLeast(minElevation)
 
-    val metrics = AmbientContext.current.resources.displayMetrics
+    val metrics = LocalContext.current.resources.displayMetrics
     val Height = metrics.heightPixels / metrics.density
     val scrWidth = metrics.widthPixels / metrics.density
 
     Card(
         modifier = Modifier
-            .preferredSize(80.dp)
+            .size(80.dp)
             .padding(8.dp)
             .shadow(elevation = 25.dp, shape = RoundedCornerShape(8.dp))
             .clickable(onClick = onClick),
@@ -495,7 +479,7 @@ fun Category(icon: ImageVector, state: ScrollState, onClick: () -> Unit = {}) {
         elevation = elevation,
     ) {
         Box {
-            Icon(imageVector = icon, modifier = Modifier.align(Alignment.Center))
+            Icon(imageVector = icon,contentDescription = null, modifier = Modifier.align(Alignment.Center))
         }
 
     }
@@ -512,4 +496,4 @@ private enum class BottomBarTabs(
 }
 
 
-*/
+
