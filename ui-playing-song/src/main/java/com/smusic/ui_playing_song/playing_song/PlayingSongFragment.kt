@@ -1,25 +1,24 @@
 package com.smusic.ui_playing_song.playing_song
 
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.animation.animatedColor
-import androidx.compose.animation.animatedFloat
+import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.*
-import androidx.compose.animation.transition
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.*
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,48 +27,37 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.loadImageResource
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
+import com.chibde.visualizer.LineBarVisualizer
 import com.smusic.base_android.Songs
-import com.smusic.base_android.rotation
-import com.smusic.base_android.rotationTransitionDefinition
-import com.smusic.base_android.Pager
-import com.smusic.base_android.PagerState
 import com.smusic.composeplayground.ui.*
-import com.smusic.ui_playing_song.util.Draw
 import com.smusic.ui_playing_song.R
 import com.smusic.ui_playing_song.playing_song.SongBottomSheetState.Closed
 import com.smusic.ui_playing_song.playing_song.SongBottomSheetState.Open
-import com.chibde.visualizer.LineBarVisualizer
-import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
-import dev.chrisbanes.accompanist.insets.navigationBarsHeight
-import dev.chrisbanes.accompanist.insets.navigationBarsPadding
-import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import com.smusic.ui_playing_song.util.Draw
+import kotlinx.coroutines.launch
 import me.tankery.lib.circularseekbar.CircularSeekBar
-import kotlin.random.Random
 
 const val TAG = "com.amir.ui_playing_song.PlayingSong.PlayingSongFragment"
-
 
 // TODO: 1/14/21 Stop rotation animation based on songState and Pager's selected page
 
@@ -105,10 +93,10 @@ class PlayingSongFragment : Fragment() {
                 val displayMetrics = resources.displayMetrics
                 val screenHeight = displayMetrics.heightPixels / displayMetrics.density
                 ComposePlaygroundTheme {
-                    ProvideWindowInsets {
+//                    ProvideWindowInsets {
                         Surface(modifier = Modifier
                             .fillMaxSize()
-                            .statusBarsPadding()
+//                            .statusBarsPadding()
                             .swipeable(
                                 state = sheetState,
                                 anchors = mapOf(
@@ -120,7 +108,7 @@ class PlayingSongFragment : Fragment() {
                             ), color = white100) {
                             PlayingSongFragmentScreenContent(requireActivity(), sheetState)
                         }
-                    }
+//                    }
                 }
 
             }
@@ -140,7 +128,7 @@ fun PlayingSongFragmentScreenContent(
         .background(white100),
         contentAlignment = Alignment.BottomEnd) {
 
-        ScrollableColumn(modifier = Modifier
+        Column(modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent),
             verticalArrangement = Arrangement.SpaceEvenly) {
@@ -168,11 +156,12 @@ fun HeaderComponent(activity: FragmentActivity) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
                 modifier = Modifier
                     .clip(CircleShape)
                     .clickable(onClick = {
-                            activity.onBackPressed()
-                        })
+                        activity.onBackPressed()
+                    })
             )
             Text(text = "Now Playing")
         }
@@ -188,6 +177,7 @@ fun HeaderComponent(activity: FragmentActivity) {
         ) {
             Icon(
                 imageVector = if (isFav.value) Icons.Rounded.FavoriteBorder else Icons.Rounded.Favorite,
+                contentDescription = null,
                 modifier = Modifier.padding(8.dp),
                 tint = Color.Red
             )
@@ -200,16 +190,16 @@ fun BottomNextSongViewComponent() {
     Row(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically) {
-        Icon(Icons.Default.KeyboardArrowUp, modifier = Modifier.alpha(reverseAlphaAnimator()))
-        Providers(AmbientContentAlpha provides ContentAlpha.high) {
+        Icon(Icons.Default.KeyboardArrowUp,contentDescription = null, modifier = Modifier.alpha(reverseAlphaAnimator()))
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
             Text(text = "Next song :")
         }
         Spacer(modifier = Modifier.width(4.dp))
-        Providers(AmbientContentAlpha provides ContentAlpha.disabled
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled
         ) {
             Text(text = "Believer | Imagine Dragons", maxLines = 1, softWrap = true)
         }
-        Icon(Icons.Default.KeyboardArrowUp, modifier = Modifier.alpha(reverseAlphaAnimator()))
+        Icon(Icons.Default.KeyboardArrowUp,contentDescription = null, modifier = Modifier.alpha(reverseAlphaAnimator()))
     }
 
 }
@@ -217,11 +207,12 @@ fun BottomNextSongViewComponent() {
 
 @Composable
 fun reverseAlphaAnimator(): Float {
-    val animatedAlpha = animatedFloat(0f)
-    onActive {
+    val coroutineScope = rememberCoroutineScope()
+    val animatedAlpha = Animatable(0f)
+    coroutineScope.launch {
         animatedAlpha.animateTo(
             targetValue = 1f,
-            anim = infiniteRepeatable(
+            animationSpec = infiniteRepeatable(
                 repeatMode = RepeatMode.Reverse,
                 animation =
                 tween(durationMillis = 2000, easing = LinearEasing),
@@ -234,50 +225,36 @@ fun reverseAlphaAnimator(): Float {
 
 @Composable
 fun songCoverAnimator(): Float {
-    val radius = animatedFloat(0f)
-    if (playing){
-        radius.animateTo(
-            targetValue = 360f,
-            anim = infiniteRepeatable(
-                animation =
-                tween(durationMillis = 10000, easing = LinearEasing),
+    val coroutineScope = rememberCoroutineScope()
+    val radius = Animatable(0f)
+    coroutineScope.launch {
+        if (playing){
+            radius.animateTo(
+                targetValue = 360f,
+                animationSpec = infiniteRepeatable(
+                    animation =
+                    tween(durationMillis = 10000, easing = LinearEasing),
+                )
             )
-        )
 
-    }else {
-        radius.stop()
+        }else {
+            radius.stop()
+        }
     }
     return radius.value
 }
 
 @Composable
 fun SongCoverComponent(song: Songs) {
-
-    val state = transition(
-        definition = rotationTransitionDefinition,
-        initState = "A",
-        toState = "B"
-    )
-
-    val radius = animatedFloat(initVal = 0f)
-
-    val pagerState: PagerState = run {
-        val clock = AmbientAnimationClock.current
-        remember(clock) {
-            PagerState(clock, 0, 0, 50)
-        }
-    }
-
-
 //    var glideBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    val metrics = AmbientContext.current.resources.displayMetrics
+    val metrics = LocalContext.current.resources.displayMetrics
     val mWidth = metrics.widthPixels / metrics.density
     Spacer(modifier = Modifier.height(2.dp))
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.shadow(elevation = 150.dp)
     ) {
-        val bitmap = loadImageResource(id = R.drawable.cover).resource.resource
+        val painter = painterResource(id = R.drawable.cover)
         /*Glide.with(AmbientContext.current).asBitmap()
             .load(song.uri)
             .into(object : CustomTarget<Bitmap>() {
@@ -293,13 +270,11 @@ fun SongCoverComponent(song: Songs) {
         }*/
 
         CircularSeekbarComponent(mWidth / 1.25)
-        Pager(state = pagerState, modifier = Modifier
+        Row(modifier = Modifier
             .fillMaxWidth()
             .height((mWidth / 1.5).dp)) {
-            val isSelected = currentPage == page
-            SongCoverItemComponent(isSelected = isSelected,
-                rotateRadius = state[rotation],
-                bitmap = bitmap, width = mWidth)
+            SongCoverItemComponent(
+                painter = painter, width = mWidth)
         }
 
     }
@@ -307,27 +282,22 @@ fun SongCoverComponent(song: Songs) {
 
 @Composable
 fun SongCoverItemComponent(
-    isSelected: Boolean,
-    rotateRadius: Float,
-    bitmap: ImageBitmap?,
+    rotateRadius: Float = 0f,
+    painter: Painter?,
     width: Float,
 ) {
-    val animateSize =
-        androidx.compose.animation.animate(if (isSelected) (width / 1.5).dp else (width / 2).dp)
-    val animateElevation = androidx.compose.animation.animate(if (isSelected) 36.dp else 0.dp)
-
     Card(Modifier
         .padding(start = 36.dp, end = 36.dp)
         .wrapContentSize()
         .clip(CircleShape),
-        elevation = animateElevation) {
+        elevation = 50.dp) {
         Box(modifier = Modifier
-            .preferredSize(animateSize)
+            .size((width / 1.5).dp)
             .clip(CircleShape)
             .rotate(songCoverAnimator())
             , contentAlignment = Alignment.Center) {
 
-            bitmap?.let {
+            painter?.let {
                 Image(it,
                     contentDescription = null,
                     modifier = Modifier
@@ -345,20 +315,20 @@ fun SongDurationsComponent() {
     val timePassed = "01:50"
     val songDuration = "02:48"
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(text = timePassed,
                 textAlign = TextAlign.Center,
-                style = TextStyle(fontSize = TextUnit.Sp(12)))
+                style = TextStyle(fontSize = 12.sp))
             Text(text = songDuration,
                 textAlign = TextAlign.Center,
-                style = TextStyle(fontSize = TextUnit.Sp(12)))
+                style = TextStyle(fontSize = 12.sp))
         }
     }
 }
 
 @Composable
 fun CircularSeekbarComponent(mSize: Double) {
-    AndroidView(modifier = Modifier.preferredSize(mSize.dp), viewBlock = { context ->
+    AndroidView(modifier = Modifier.size(mSize.dp), factory = { context ->
         CircularSeekBar(context).apply {
             circleProgressColor = android.graphics.Color.parseColor("#FF3700B2")
             pointerColor = android.graphics.Color.parseColor("#FF3700B2")
@@ -387,7 +357,7 @@ fun SongTitleComponent(song: Songs) {
                 offset = Offset(x = 5f, y = 5f)),
             color = titlesColor,
             fontWeight = FontWeight.Bold,
-            fontSize = TextUnit.Sp(20),
+            fontSize = 20.sp,
         )
     )
 }
@@ -395,7 +365,7 @@ fun SongTitleComponent(song: Songs) {
 @Composable
 fun SingerNameComponent(song: Songs) {
     Spacer(modifier = Modifier.height(4.dp))
-    Providers(AmbientContentAlpha provides ContentAlpha.high) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
         Text(
             text = song.artist,
             modifier = Modifier.fillMaxWidth(),
@@ -405,7 +375,7 @@ fun SingerNameComponent(song: Songs) {
             maxLines = 1,
             style = TextStyle(
                 fontWeight = FontWeight.Thin,
-                fontSize = TextUnit.Sp(12),
+                fontSize = 12.sp,
             )
         )
     }
@@ -428,7 +398,7 @@ fun SongDetailsComponent() {
                 .clickable(onClick = { /*TODO*/ }),
             color = white200
         ) {
-            Icon(Icons.Rounded.VolumeDown, modifier = Modifier.padding(12.dp))
+            Icon(Icons.Rounded.VolumeDown,contentDescription = null, modifier = Modifier.padding(12.dp))
         }
         Spacer(modifier = Modifier.width(8.dp))
         MusicVisualizerComponent()
@@ -439,7 +409,7 @@ fun SongDetailsComponent() {
                 .clickable(onClick = { /*TODO*/ }),
             color = white200
         ) {
-            Icon(Icons.Rounded.VolumeUp, modifier = Modifier.padding(12.dp))
+            Icon(Icons.Rounded.VolumeUp,contentDescription = null, modifier = Modifier.padding(12.dp))
         }
     }
 }
@@ -447,13 +417,13 @@ fun SongDetailsComponent() {
 @Composable
 fun MusicVisualizerComponent() {
 
-    val metrics = AmbientContext.current.resources.displayMetrics
+    val metrics = LocalContext.current.resources.displayMetrics
     val mWidth = metrics.widthPixels / metrics.density
 
     AndroidView(modifier = Modifier
         .height(50.dp)
-        .preferredWidth((mWidth * 0.25).dp),
-        viewBlock = {
+        .width((mWidth * 0.25).dp),
+        factory = {
             LineBarVisualizer(it).apply {
                 setColor(android.graphics.Color.parseColor("#FF3700B2"))
 //            setPlayer(mp.audioSessionId)
@@ -467,8 +437,8 @@ fun MusicVisualizerComponent() {
 fun SongControllersComponent() {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding(),
+            .fillMaxWidth(),
+//            .navigationBarsPadding(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
@@ -506,6 +476,7 @@ fun PlayPauseButton() {
     ) {
         Icon(
             imageVector = playPauseIcon,
+            contentDescription = null,
             modifier = Modifier
                 .size(48.dp)
                 .padding(8.dp)
@@ -523,40 +494,20 @@ fun MusicControlButton(
     IconButton(onClick = onClick,
         modifier = Modifier
             .clickable(onClick = { })
-            .preferredSize(36.dp)) {
-        Icon(imageVector = icon, tint = foregroundColor)
+            .size(36.dp)) {
+        Icon(imageVector = icon,contentDescription = null, tint = foregroundColor)
     }
 }
-
-
-@Composable
-fun DrawLine() {
-    val onSurfaceColor = purple700
-    val rand = Random.nextDouble(10.0, 100.0)
-    val offset = 100f - rand
-    val startYOffset = offset / 2
-    Canvas(modifier = Modifier
-        .padding(top = (rand % 3).dp, bottom = (rand % 2).dp)
-        .preferredHeight(50.dp)
-        .preferredWidth(1.dp)) {
-        drawLine(
-            color = onSurfaceColor,
-            start = Offset(0f, startYOffset.toFloat()),
-            end = Offset(0f, 100f - (startYOffset.toFloat())),
-            strokeWidth = size.width * 2f
-        )
-    }
-}
-
 
 @ExperimentalMaterialApi
 @Composable
 fun PlayListFabComponent(sheetState: SwipeableState<SongBottomSheetState>) {
-    val fabSize = animatedFloat(initVal = 48f)
-    val fabColor = animatedColor(purple700)
-    val playListIconAlpha = animatedFloat(initVal = 1f)
-    val columnAlpha = animatedFloat(initVal = 0f)
-    val metrics = AmbientContext.current.resources.displayMetrics
+    val coroutineScope = rememberCoroutineScope()
+    val fabSize = Animatable(48f)
+    val fabColor = Animatable(purple700)
+    val playListIconAlpha = Animatable(1f)
+    val columnAlpha = Animatable(0f)
+    val metrics = LocalContext.current.resources.displayMetrics
     val height = metrics.heightPixels / metrics.density
 
     Box(
@@ -564,16 +515,17 @@ fun PlayListFabComponent(sheetState: SwipeableState<SongBottomSheetState>) {
     ) {
         Canvas(modifier = Modifier
             .width(fabSize.value.dp)
-            .navigationBarsHeight(additional = fabSize.value.dp + 16.dp)
-            .clip(
-                RoundedCornerShape(topLeft = 24.dp))
+//            .navigationBarsHeight(additional = fabSize.value.dp + 16.dp)
+            .clip(RoundedCornerShape(topStart = 24.dp))
             .clickable(
                 onClick = {
-                    openSongsBottomSheetContentsAnimations(fabSize = fabSize,
-                        height = height,
-                        playListIconAlpha = playListIconAlpha,
-                        columnAlpha = columnAlpha,
-                        fabColor = fabColor)
+                    coroutineScope.launch {
+                        openSongsBottomSheetContentsAnimations(fabSize = fabSize,
+                            height = height,
+                            playListIconAlpha = playListIconAlpha,
+                            columnAlpha = columnAlpha,
+                            fabColor = fabColor)
+                    }
 
                 }))
         {
@@ -582,52 +534,54 @@ fun PlayListFabComponent(sheetState: SwipeableState<SongBottomSheetState>) {
             )
         }
         Icon(Icons.Rounded.PlaylistPlay,
+            contentDescription = null,
             modifier = Modifier
                 .alpha(playListIconAlpha.value)
-                .padding(horizontal = 12.dp, vertical = 16.dp)
-                .navigationBarsPadding(),
+                .padding(horizontal = 12.dp, vertical = 16.dp),
+//                .navigationBarsPadding(),
             tint = Color.White)
     }
 
 }
 
-private fun openSongsBottomSheetContentsAnimations(
-    fabSize: AnimatedFloat,
+private suspend fun openSongsBottomSheetContentsAnimations(
+    fabSize: Animatable<Float,AnimationVector1D>,
     height: Float,
-    playListIconAlpha: AnimatedFloat,
-    columnAlpha: AnimatedFloat,
-    fabColor: AnimatedValue<Color, AnimationVector4D>,
+    playListIconAlpha: Animatable<Float,AnimationVector1D>,
+    columnAlpha: Animatable<Float,AnimationVector1D>,
+    fabColor: Animatable<Color,AnimationVector4D>,
 ) {
     fabSize.animateTo(
         targetValue = height,
-        anim =
+        animationSpec =
         tween(durationMillis = 600, easing = FastOutSlowInEasing),
     )
     playListIconAlpha.animateTo(targetValue = 0f,
-        anim = tween(600, easing = FastOutSlowInEasing))
+        animationSpec = tween(600, easing = FastOutSlowInEasing))
     columnAlpha.animateTo(targetValue = 1f,
-        anim = tween(600, easing = FastOutSlowInEasing))
+        animationSpec = tween(600, easing = FastOutSlowInEasing))
     fabColor.animateTo(targetValue = white100,
-        anim = tween(1000, easing = FastOutSlowInEasing))
+        animationSpec = tween(1000, easing = FastOutSlowInEasing))
 }
 
-private fun closeSongsBottomSheetContentsAnimations(
-    fabSize: AnimatedFloat,
-    playListIconAlpha: AnimatedFloat,
-    columnAlpha: AnimatedFloat,
-    fabColor: AnimatedValue<Color, AnimationVector4D>,
+private suspend fun closeSongsBottomSheetContentsAnimations(
+    fabSize: Animatable<Float,AnimationVector1D>,
+    height: Float,
+    playListIconAlpha: Animatable<Float,AnimationVector1D>,
+    columnAlpha: Animatable<Float,AnimationVector1D>,
+    fabColor: Animatable<Color,AnimationVector4D>,
 ) {
     fabSize.animateTo(
         targetValue = 48f,
-        anim =
+        animationSpec =
         tween(durationMillis = 600, easing = FastOutSlowInEasing),
     )
     playListIconAlpha.animateTo(targetValue = 1f,
-        anim = tween(600, easing = FastOutSlowInEasing))
+        animationSpec = tween(600, easing = FastOutSlowInEasing))
     columnAlpha.animateTo(targetValue = 0f,
-        anim = tween(600, easing = FastOutSlowInEasing))
+        animationSpec = tween(600, easing = FastOutSlowInEasing))
     fabColor.animateTo(targetValue = purple700,
-        anim = tween(1000, easing = FastOutSlowInEasing))
+        animationSpec = tween(1000, easing = FastOutSlowInEasing))
 }
 
 enum class SongBottomSheetState {
