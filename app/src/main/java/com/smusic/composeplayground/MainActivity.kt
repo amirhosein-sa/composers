@@ -1,32 +1,29 @@
 package com.smusic.composeplayground
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.core.VisibilityThreshold
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.setContent
-import androidx.compose.ui.res.loadImageResource
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
@@ -53,13 +50,13 @@ class MainActivity : AppCompatActivity() {
 // horizontally in this space. Therefore the 50.dp x 20.dp is centered horizontally
 // in the space.
             Column(
-                Modifier.preferredSize(50.dp)
+                Modifier.size(50.dp)
                     .wrapContentWidth(Alignment.CenterHorizontally)
-                    .preferredWidth(450.dp)
+                    .width(450.dp)
                     .background(Color.Red)
             ){
-                Text(text = "Test",modifier = Modifier.preferredWidth(300.dp).background(Color.Gray))
-                Text(text = "Test",modifier = Modifier.preferredWidth(50.dp) .background(Color.Blue))
+                Text(text = "Test",modifier = Modifier.width(300.dp).background(Color.Gray))
+                Text(text = "Test",modifier = Modifier.width(50.dp) .background(Color.Blue))
             }
 
         }
@@ -68,13 +65,13 @@ class MainActivity : AppCompatActivity() {
 
 
 }
-
+/*
 @Composable
 fun Item(isSelected: Boolean) {
-    val context = AmbientContext.current.resources
+    val context = LocalContext.current.resources
     val displayMetrics = context.displayMetrics
     val scrWidth = displayMetrics.widthPixels / displayMetrics.density
-    val bitmap = loadImageResource(id = R.drawable.cover).resource.resource
+    val bitmap = painterResource(id = R.drawable.cover).resource.resource
 //    val animateHeight = animateDpAsState(if (isSelected) 645.dp else 360.dp, remember {
 //        spring(visibilityThreshold = Dp.VisibilityThreshold)
 //    }).value
@@ -86,7 +83,7 @@ fun Item(isSelected: Boolean) {
         Card(elevation = animateDpAsState(animateElevation, remember {
             spring(visibilityThreshold = Dp.VisibilityThreshold)
         }, null).value, modifier = Modifier
-            .preferredSize(animateWidth)
+            .size(animateWidth)
             .clip(CutCornerShape(36.dp))
             .padding(16.dp)) {
             Image(bitmap = it,
@@ -97,7 +94,7 @@ fun Item(isSelected: Boolean) {
     }
 
 
-}
+}*/
 
 @Composable
 fun MainScreenHeader() {
@@ -140,7 +137,7 @@ fun MainScreenContent() {
 
 @Composable
 fun AlbumsGrid() {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     val resources = context.resources
     val displayMetrics = resources.displayMetrics
     val screenWidth = displayMetrics.widthPixels / displayMetrics.density
@@ -173,7 +170,7 @@ fun AlbumsGrid() {
 
 @Composable
 fun AlbumItem(height: Int, screenWidth: Float) {
-    val bitmap = loadImageResource(id = R.drawable.cover).resource.resource
+    val bitmap = painterResource(id = R.drawable.cover)
     Column(modifier = Modifier.width((screenWidth / 3).dp)) {
         bitmap?.let {
             Image(it,
@@ -181,24 +178,24 @@ fun AlbumItem(height: Int, screenWidth: Float) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .height(height.dp)
-                    .clip(RoundedCornerShape(topLeft = 32.dp,
-                        topRight = 8.dp,
-                        bottomLeft = 8.dp,
-                        bottomRight = 32.dp)))
+                    .clip(RoundedCornerShape(topStart = 32.dp,
+                        topEnd = 8.dp,
+                        bottomStart = 8.dp,
+                        bottomEnd = 32.dp)))
         }
         Spacer(modifier = Modifier.height(4.dp))
-        Providers(AmbientContentAlpha provides ContentAlpha.high) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
             Text(text = "songName",
                 modifier = Modifier
                     .align(Alignment.Start)
-                    .preferredWidth(72.dp),
+                    .width(72.dp),
                 style = TextStyle(fontSize = 14.sp),
                 softWrap = true,
                 maxLines = 2)
         }
         Spacer(modifier = Modifier.height(4.dp))
-        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
-            Text(text = "singerName",
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Text(text = "singerName",
                 style = TextStyle(fontSize = 12.sp),
                 modifier = Modifier.align(Alignment.Start))
         }
@@ -228,29 +225,29 @@ fun SingerMainScreen() {
 
 @Composable
 fun SingerItem(songName: String, singerName: String) {
-    val bm = loadImageResource(id = R.drawable.cover).resource.resource
+    val bm = painterResource(id = R.drawable.cover)
     Column(modifier = Modifier.padding(start = 4.dp, end = 4.dp)) {
         Surface(modifier = Modifier
-            .preferredWidth(72.dp)
-            .preferredHeight(72.dp),
-            shape = RoundedCornerShape(topLeft = 32f,
-                topRight = 16f,
-                bottomLeft = 16f,
-                bottomRight = 32f)) {
+            .width(72.dp)
+            .height(72.dp),
+            shape = RoundedCornerShape(topStart = 32f,
+                topEnd = 16f,
+                bottomStart = 16f,
+                bottomEnd = 32f)) {
             bm?.let {
                 Image(it, contentDescription = null, contentScale = ContentScale.Crop)
             }
         }
-        Providers(AmbientContentAlpha provides ContentAlpha.high) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
             Text(text = songName,
                 modifier = Modifier
                     .align(Alignment.Start)
-                    .preferredWidth(72.dp),
+                    .width(72.dp),
                 style = TextStyle(fontSize = 12.sp),
                 softWrap = true,
                 maxLines = 2)
         }
-        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(text = singerName,
                 style = TextStyle(fontSize = 6.sp),
                 modifier = Modifier.align(Alignment.Start))
